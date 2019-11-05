@@ -1,9 +1,15 @@
 package main
 
 import (
-	"fmt"
+	"github.com/friendsofgo/workshop-microservices/cmd/counters-api/server/http"
+)
+
+const (
+	_defaultHost       = "localhost"
+	_defaultPort uint = 3000
 )
 
 func main() {
-	fmt.Println("Welcome to our Microservices Workshop")
+	srv := http.NewServer(_defaultHost, _defaultPort)
+	srv.Serve()
 }
