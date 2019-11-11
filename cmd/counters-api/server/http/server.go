@@ -27,7 +27,7 @@ func NewServer(host string, port uint, logger *log.Logger) *Server {
 	}
 
 	router := mux.NewRouter()
-	router.Use(s.loggerMiddleware)
+	router.Use(s.loggerMiddleware, s.requestTimeMiddleware)
 
 	router.HandleFunc("/health", s.healthHandler)
 
