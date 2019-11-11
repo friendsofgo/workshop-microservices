@@ -11,20 +11,24 @@ import (
 )
 
 type Server struct {
-	host string
-	port uint
+	host   string
+	port   uint
+	logger *log.Logger
 
 	srv *http.Server
 }
 
 // NewServer return a new HTTP server
-func NewServer(host string, port uint) *Server {
+func NewServer(host string, port uint, logger *log.Logger) *Server {
 	s := &Server{
-		host: host,
-		port: port,
+		host:   host,
+		port:   port,
+		logger: logger,
 	}
 
 	router := mux.NewRouter()
+	router.Use(s.loggerMiddleware)
+
 	router.HandleFunc("/health", s.healthHandler)
 
 	s.srv = &http.Server{

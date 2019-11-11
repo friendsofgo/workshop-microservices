@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/friendsofgo/workshop-microservices/cmd/counters-api/server/http"
 )
@@ -12,6 +13,7 @@ const (
 )
 
 func main() {
-	srv := http.NewServer(_defaultHost, _defaultPort)
+	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
+	srv := http.NewServer(_defaultHost, _defaultPort, logger)
 	log.Fatal(srv.Serve())
 }
