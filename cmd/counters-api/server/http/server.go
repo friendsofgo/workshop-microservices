@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
+
+	"github.com/gorilla/mux"
 )
 
 type Server struct {
 	host string
 	port uint
 
-	srv *http.ServeMux
+	srv *http.Server
 }
 
 // NewServer return a new HTTP server
@@ -19,20 +22,24 @@ func NewServer(host string, port uint) *Server {
 	s := &Server{
 		host: host,
 		port: port,
-
-		srv: http.NewServeMux(),
 	}
 
-	s.srv.HandleFunc("/health", s.healthHandler)
+	router := mux.NewRouter()
+	router.HandleFunc("/health", s.healthHandler)
+
+	s.srv = &http.Server{
+		Handler:      router,
+		Addr:         fmt.Sprintf("%s:%d", host, port),
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
 	return s
 }
 
 // Serve execute the server on the host and port indicated previously
-func (s Server) Serve() {
-	httpAddr := fmt.Sprintf("%s:%d", s.host, s.port)
-	log.Println("The server is on tap now:", httpAddr)
-
-	_ = http.ListenAndServe(httpAddr, s.srv)
+func (s Server) Serve() error {
+	log.Println("The server is on tap now:", s.srv.Addr)
+	return s.srv.ListenAndServe()
 }
 
 type healthResponse struct {
