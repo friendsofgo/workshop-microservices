@@ -3,11 +3,11 @@ package http
 import (
 	"context"
 	"fmt"
-	"github.com/friendsofgo/workshop-microservices/internal/creating"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/friendsofgo/workshop-microservices/internal/creating"
 	"github.com/gorilla/mux"
 )
 

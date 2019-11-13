@@ -2,8 +2,9 @@ package counters
 
 import (
 	"context"
-	"github.com/friendsofgo/workshop-microservices/kit/ulid"
 	"time"
+
+	"github.com/friendsofgo/workshop-microservices/kit/ulid"
 )
 
 // Counter counter entity

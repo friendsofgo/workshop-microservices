@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+
 	counters "github.com/friendsofgo/workshop-microservices/internal"
 	"go.mongodb.org/mongo-driver/mongo"
 )

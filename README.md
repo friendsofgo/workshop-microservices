@@ -10,7 +10,7 @@ The application that will be created during the workshop is a one microservices 
 counters. With this workshop we can offer a demostration of how you can create a simple microservice, using
 Go.
 
-It is built using [Gin Gonic](https://github.com/gin-gonic/gin), a powerful framework to create APIs.
+It is built using [Gorilla mux](https://github.com/gorilla/mux), a powerful library to create APIs.
 
 The final microservices will be fully functional, for that we use [mongoDB](https://www.mongodb.com/es)
 to store the data, and [Kafka](https://kafka.apache.org/) for sharing events between our microservices and the others.
@@ -23,7 +23,29 @@ In this application we're using, of course, the standard library, but also some 
 * For Kafka: [github.com/segmentio/kafka-go](https://github.com/segmentio/kafka-go)
 * For Logging: [github.com/uber-go/zap](https://github.com/uber-go/zap)
 
+## Prerequisites
+
+You will need to install docker:
+https://docs.docker.com/install/
+
+Also you will need the next docker images:
+
+For mongo:
+```
+$ docker pull mongo:3.4
+```
+
+For Kafka:
+```
+$ docker pull landoop/kafka-lenses-dev:3.0
+```
+
 ## Using our microservices
+
+### Run docker (only necessary for solution two onwards)
+```sh
+$ docker-compose up -d
+``
 
 ### Build
 
