@@ -45,7 +45,7 @@ $ docker pull landoop/kafka-lenses-dev:3.0
 ### Run docker (only necessary for solution two onwards)
 ```sh
 $ docker-compose up -d
-``
+```
 
 ### Build
 
