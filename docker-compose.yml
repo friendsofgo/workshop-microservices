@@ -12,6 +12,23 @@ services:
     ports:
       - 27017:27017
 
+  lense:
+    image: landoop/kafka-lenses-dev:2.1.7
+    environment:
+      - ADV_HOST=127.0.0.1
+      - EULA=https://dl.lenses.stream/d/?id={LENSE_ID}
+      - SAMPLEDATA=0
+      - RUNNING_SAMPLEDATA=0
+    ports:
+      - 3030:3030
+      - 9092:9092
+      - 2181:2181
+      - 8081:8081
+      - 9581:9581
+      - 9582:9582
+      - 9584:9584
+      - 9585:9585
+
 volumes:
   mongodb:
   mongodb_config:

@@ -5,10 +5,14 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
+	"sync"
 
+	"github.com/friendsofgo/workshop-microservices/cmd/counters-api/event"
 	"github.com/friendsofgo/workshop-microservices/cmd/counters-api/server/http"
 	"github.com/friendsofgo/workshop-microservices/internal/creating"
 	"github.com/friendsofgo/workshop-microservices/internal/storage/mongo"
+	"github.com/friendsofgo/workshop-microservices/kit/kafka"
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -23,6 +27,11 @@ func main() {
 		mongoHost    = os.Getenv("WORKSHOP_MONGO_HOST")
 		mongoPort, _ = strconv.ParseUint(os.Getenv("WORKSHOP_MONGO_PORT"), 10, 32)
 		mongoDB      = os.Getenv("WORKSHOP_MONGO_DB")
+
+		brokersStr = os.Getenv("WORKSHOP_KAFKA_BROKERS")
+		brokers    = strings.Split(brokersStr, ",")
+		userTopic  = os.Getenv("WORKSHOP_KAFKA_USER_TOPIC")
+		userGroup  = os.Getenv("WORKSHOP_KAFKA_USER_GROUP")
 	)
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
@@ -37,8 +46,32 @@ func main() {
 	var (
 		counterRepository = mongo.NewCounterRepository(mongoClient.Database(mongoDB))
 		creatingService   = creating.NewService(counterRepository)
+
+		dialer           = kafka.Dial(brokers)
+		userEventHandler = event.NewUserHandler(creatingService)
+		userConsumer     = kafka.NewConsumer(dialer, userTopic, userGroup)
 	)
 
-	srv := http.NewServer(context.Background(), _defaultHost, _defaultPort, creatingService, logger)
-	log.Fatal(srv.Serve())
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		if err := userConsumer.Read(rootCtx, userEventHandler.Handle); err != nil {
+			cancel()
+			log.Fatalln(err)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		srv := http.NewServer(context.Background(), _defaultHost, _defaultPort, creatingService, logger)
+		if err := srv.Serve(); err != nil {
+			cancel()
+			log.Fatalln(err)
+		}
+	}()
+
+	wg.Wait()
+
 }
