@@ -23,26 +23,14 @@ In this application we're using, of course, the standard library, but also some 
 * For Kafka: [github.com/segmentio/kafka-go](https://github.com/segmentio/kafka-go)
 * For Logging: [github.com/uber-go/zap](https://github.com/uber-go/zap)
 
-## Prerequisites
-
-You will need to install docker:
-https://docs.docker.com/install/
-
-Also you will need the next docker images:
-
-For mongo:
-```
-$ docker pull mongo:3.4
-```
-
-For Kafka:
-```
-$ docker pull landoop/kafka-lenses-dev:3.0
-```
-
 ## Using our microservices
 
 ### Run docker (only necessary for solution two onwards)
+First of all you need a lenses key, it's totally free you only need to register on: [https://lenses.io/downloads/lenses/](https://lenses.io/downloads/lenses/)
+then they send you a message with a link, this link will have your necessary key.
+
+You need to replace on the `docker-compose.yml`, `{LENSE_ID}` for your key and that's all.
+
 ```sh
 $ docker-compose up -d
 ```
@@ -63,7 +51,7 @@ For testing the application we're using a tool that using `go test` underlying b
 For that you need to install before to run it:
 
 ```sh
-go get -u github.com/rakyll/gotest
+GO111MODULE=off go get -u github.com/rakyll/gotest
 ```
 
 And then you can run:
@@ -74,3 +62,6 @@ make test
 
 ## License
 MIT License, see [LICENSE](https://github.com/friendsofgo/workshop-microservices/blob/master/LICENSE)
+
+
+  
