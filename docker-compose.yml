@@ -13,7 +13,7 @@ services:
       - 27017:27017
 
   lense:
-    image: landoop/kafka-lenses-dev:2.1.7
+    image: lensesio/box:3.0.2
     environment:
       - ADV_HOST=127.0.0.1
       - EULA=https://dl.lenses.stream/d/?id={LENSE_ID}

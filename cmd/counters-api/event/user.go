@@ -3,6 +3,7 @@ package event
 import (
 	"context"
 	"encoding/json"
+	"log"
 
 	"github.com/friendsofgo/workshop-microservices/internal/creating"
 )
@@ -34,6 +35,7 @@ func (u *User) Handle(ctx context.Context, message []byte) error {
 
 	switch m.EventType {
 	case userCreatedEventType:
+		log.Printf("%s message(%s) consumed", userCreatedEventType, m.EventID)
 		return u.creatingService.CreateCounter(ctx, "My first counter", m.Data.UserID)
 	default:
 		return nil
