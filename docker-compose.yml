@@ -16,7 +16,7 @@ services:
     image: lensesio/box:3.0.2
     environment:
       - ADV_HOST=127.0.0.1
-      - EULA=https://dl.lenses.stream/d/?id={LENSE_ID}
+      - EULA=https://dl.lenses.stream/d/?id=f728202b-ce09-401b-846c-9d757e674466
       - SAMPLEDATA=0
       - RUNNING_SAMPLEDATA=0
     ports:

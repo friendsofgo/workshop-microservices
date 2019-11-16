@@ -11,8 +11,10 @@ import (
 	"github.com/friendsofgo/workshop-microservices/cmd/counters-api/event"
 	"github.com/friendsofgo/workshop-microservices/cmd/counters-api/server/http"
 	"github.com/friendsofgo/workshop-microservices/internal/creating"
+	"github.com/friendsofgo/workshop-microservices/internal/fetching"
 	"github.com/friendsofgo/workshop-microservices/internal/storage/mongo"
 	"github.com/friendsofgo/workshop-microservices/kit/kafka"
+
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -46,6 +48,7 @@ func main() {
 	var (
 		counterRepository = mongo.NewCounterRepository(mongoClient.Database(mongoDB))
 		creatingService   = creating.NewService(counterRepository)
+		fetchingService   = fetching.NewService(counterRepository)
 
 		dialer           = kafka.Dial(brokers)
 		userEventHandler = event.NewUserHandler(creatingService)
@@ -65,7 +68,7 @@ func main() {
 
 	go func() {
 		defer wg.Done()
-		srv := http.NewServer(context.Background(), _defaultHost, _defaultPort, creatingService, logger)
+		srv := http.NewServer(context.Background(), _defaultHost, _defaultPort, creatingService, fetchingService, logger)
 		if err := srv.Serve(); err != nil {
 			cancel()
 			log.Fatalln(err)

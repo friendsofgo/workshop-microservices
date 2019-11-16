@@ -26,7 +26,6 @@ func NewConsumer(dialer *Dialer, topic, groupID string) *Consumer {
 		MaxWait:         1 * time.Second, // Maximum amount of time to wait for new data to come when fetching batches of messages from kafka.
 		ReadLagInterval: -1,
 		GroupID:         groupID,
-		StartOffset:     kafka.LastOffset,
 	}
 
 	return &Consumer{reader: kafka.NewReader(c)}

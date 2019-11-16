@@ -9,11 +9,12 @@ import (
 
 // Counter counter entity
 type Counter struct {
-	ID        string     `bson:"_id"`
-	Name      string     `bson:"name"`
-	Value     uint       `bson:"value"`
-	BelongsTo string     `bson:"belongs_to"`
-	UpdatedAt *time.Time `bsong:"updated_at"`
+	ID        string     `bson:"_id" json:"id"`
+	Name      string     `bson:"name" json:"name"`
+	Value     uint       `bson:"value" json:"value"`
+	BelongsTo string     `bson:"belongs_to" json:"belongs_to"`
+	CreatedAt time.Time `bson:"created_at" json:"-"`
+	UpdatedAt *time.Time `bson:"updated_at" json:"-"`
 }
 
 // NewCounter initialize a counter entity
@@ -27,5 +28,6 @@ func NewCounter(name, belongsTo string) *Counter {
 
 // CounterRepository declare the necessary interface to our repository
 type CounterRepository interface {
+	FetchAllByUser(ctx context.Context, belongsTo string) ([]Counter, error)
 	Save(ctx context.Context, counter *Counter) error
 }
