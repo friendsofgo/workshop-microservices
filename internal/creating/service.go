@@ -22,9 +22,5 @@ func NewService(cR counters.CounterRepository) Service {
 
 // CreateCounter creates a new counter into your storage system
 func (s service) CreateCounter(ctx context.Context, name, belongsTo string) error {
-	c := counters.NewCounter(name, belongsTo)
-	if err := s.repository.Save(ctx, c); err != nil {
-		return err
-	}
-	return nil
+	return s.repository.Save(ctx, counters.NewCounter(name, belongsTo))
 }

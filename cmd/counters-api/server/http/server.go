@@ -7,9 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
-
 	"github.com/friendsofgo/workshop-microservices/internal/creating"
+	"github.com/gorilla/mux"
 )
 
 type Server struct {
