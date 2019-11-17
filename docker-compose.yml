@@ -12,6 +12,23 @@ services:
     ports:
       - 27017:27017
 
+  lense:
+    image: lensesio/box:3.0.2
+    environment:
+      - ADV_HOST=127.0.0.1
+      - EULA=https://dl.lenses.stream/d/?id=f728202b-ce09-401b-846c-9d757e674466
+      - SAMPLEDATA=0
+      - RUNNING_SAMPLEDATA=0
+    ports:
+      - 3030:3030
+      - 9092:9092
+      - 2181:2181
+      - 8081:8081
+      - 9581:9581
+      - 9582:9582
+      - 9584:9584
+      - 9585:9585
+
 volumes:
   mongodb:
   mongodb_config:

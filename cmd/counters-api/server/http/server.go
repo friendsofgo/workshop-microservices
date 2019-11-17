@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/friendsofgo/workshop-microservices/internal/creating"
+	"github.com/friendsofgo/workshop-microservices/internal/fetching"
+
 	"github.com/gorilla/mux"
 )
 
@@ -17,16 +19,18 @@ type Server struct {
 	srv  *http.Server
 
 	creating creating.Service
+	fetching fetching.Service
 	logger   *log.Logger
 }
 
 // NewServer return a new HTTP server
-func NewServer(ctx context.Context, host string, port uint, c creating.Service, logger *log.Logger) *Server {
+func NewServer(ctx context.Context, host string, port uint, c creating.Service, f fetching.Service, logger *log.Logger) *Server {
 	s := &Server{
 		host:   host,
 		port:   port,
 		logger: logger,
 
+		fetching: f,
 		creating: c,
 	}
 
@@ -35,6 +39,8 @@ func NewServer(ctx context.Context, host string, port uint, c creating.Service, 
 
 	router.HandleFunc("/health", s.healthHandler(ctx)).Methods(http.MethodGet)
 	router.HandleFunc("/counters", s.createCounterHandler(ctx)).Methods(http.MethodPost)
+
+	// someone need to call the handler fetchAllCountersHandler
 
 	s.srv = &http.Server{
 		Handler:      router,

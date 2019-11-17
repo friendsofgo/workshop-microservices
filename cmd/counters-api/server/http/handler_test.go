@@ -10,6 +10,8 @@ import (
 	"testing"
 
 	creatingmock "github.com/friendsofgo/workshop-microservices/test/creating"
+	fetchingmock "github.com/friendsofgo/workshop-microservices/test/fetching/service.go"
+
 	"github.com/stretchr/testify/mock"
 )
 
@@ -20,7 +22,7 @@ func TestServer_healthHandler(t *testing.T) {
 	}
 
 	rec := httptest.NewRecorder()
-	srv := NewServer(context.Background(), "", 0, &creatingmock.Service{}, &log.Logger{})
+	srv := NewServer(context.Background(), "", 0, &creatingmock.Service{}, &fetchingmock.Service{}, &log.Logger{})
 	srv.healthHandler(context.Background()).ServeHTTP(rec, req)
 
 	res := rec.Result()
@@ -62,7 +64,7 @@ func TestServer_createHandler(t *testing.T) {
 		mock.AnythingOfType("string"),
 	).Return(nil).Once()
 
-	srv := NewServer(testCtx, "", 0, service, &log.Logger{})
+	srv := NewServer(testCtx, "", 0, service, &fetchingmock.Service{}, &log.Logger{})
 	srv.createCounterHandler(testCtx).ServeHTTP(rec, req)
 
 	res := rec.Result()

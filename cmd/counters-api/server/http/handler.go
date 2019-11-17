@@ -49,3 +49,11 @@ func (s Server) createCounterHandler(ctx context.Context) http.HandlerFunc {
 		w.WriteHeader(http.StatusCreated)
 	}
 }
+
+func (s Server) fetchAllCountersHandler(ctx context.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("fetchAllCountersHandler"))
+	}
+}
