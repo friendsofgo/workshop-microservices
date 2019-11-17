@@ -15,10 +15,6 @@ type Event struct {
 	OccurredOn  time.Time   `json:"occurred_on"`
 }
 
-func (e *Event) decodePayload(i interface{}) error {
-	return mapstructure.Decode(e.Payload, i)
-}
-
 func EventDecode(message []byte, payload interface{}) (Event, error) {
 	var decoded Event
 	err := json.Unmarshal(message, &decoded)
@@ -30,4 +26,8 @@ func EventDecode(message []byte, payload interface{}) (Event, error) {
 		return Event{}, nil
 	}
 	return decoded, nil
+}
+
+func (e *Event) decodePayload(i interface{}) error {
+	return mapstructure.Decode(e.Payload, i)
 }
