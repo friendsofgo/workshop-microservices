@@ -1,35 +1,41 @@
 package http
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
+
+	"github.com/friendsofgo/workshop-microservices/internal/creating"
 )
 
 type Server struct {
-	host   string
-	port   uint
-	logger *log.Logger
+	host string
+	port uint
+	srv  *http.Server
 
-	srv *http.Server
+	creating creating.Service
+	logger   *log.Logger
 }
 
 // NewServer return a new HTTP server
-func NewServer(host string, port uint, logger *log.Logger) *Server {
+func NewServer(ctx context.Context, host string, port uint, c creating.Service, logger *log.Logger) *Server {
 	s := &Server{
 		host:   host,
 		port:   port,
 		logger: logger,
+
+		creating: c,
 	}
 
 	router := mux.NewRouter()
 	router.Use(s.loggerMiddleware, s.requestTimeMiddleware)
 
-	router.HandleFunc("/health", s.healthHandler)
+	router.HandleFunc("/health", s.healthHandler(ctx)).Methods(http.MethodGet)
+	router.HandleFunc("/counters", s.createCounterHandler(ctx)).Methods(http.MethodPost)
 
 	s.srv = &http.Server{
 		Handler:      router,
@@ -44,24 +50,4 @@ func NewServer(host string, port uint, logger *log.Logger) *Server {
 func (s Server) Serve() error {
 	log.Println("The server is on tap now:", s.srv.Addr)
 	return s.srv.ListenAndServe()
-}
-
-type healthResponse struct {
-	Kind    string `json:"kind"`
-	Message string `json:"message"`
-}
-
-func (s Server) healthHandler(w http.ResponseWriter, r *http.Request) {
-	response := map[string]healthResponse{
-		"data": healthResponse{Kind: "health", Message: "everything is fine"},
-	}
-
-	b, err := json.Marshal(response)
-	if err != nil {
-		http.Error(w, "error proccessing the response", http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write(b)
 }
