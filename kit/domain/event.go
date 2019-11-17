@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -14,6 +15,19 @@ type Event struct {
 	OccurredOn  time.Time   `json:"occurred_on"`
 }
 
-func (e *Event) DecodePayload(i interface{}) error {
+func (e *Event) decodePayload(i interface{}) error {
 	return mapstructure.Decode(e.Payload, i)
+}
+
+func EventDecode(message []byte, payload interface{}) (Event, error) {
+	var decoded Event
+	err := json.Unmarshal(message, &decoded)
+	if err != nil {
+		return Event{}, nil
+	}
+
+	if err := decoded.decodePayload(payload); err != nil {
+		return Event{}, nil
+	}
+	return decoded, nil
 }

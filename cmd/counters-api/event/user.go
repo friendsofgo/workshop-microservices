@@ -2,7 +2,6 @@ package event
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 
 	"github.com/friendsofgo/workshop-microservices/internal/creating"
@@ -25,7 +24,9 @@ type CreatedUserEventPayload struct {
 }
 
 func (u *User) Handle(ctx context.Context, message []byte) error {
-	m, err := u.decodeMessage(message)
+	var payload CreatedUserEventPayload
+	m, err := domain.EventDecode(message, &payload)
+
 	if err != nil {
 		return err
 	}
@@ -33,20 +34,8 @@ func (u *User) Handle(ctx context.Context, message []byte) error {
 	switch m.EventType {
 	case userCreatedEventType:
 		log.Printf("%s message(%s) consumed", userCreatedEventType, m.ID)
-		var payload CreatedUserEventPayload
-		err := m.DecodePayload(&payload)
-		if err != nil {
-			return err
-		}
-
 		return u.creatingService.CreateCounter(ctx, "My first counter", payload.UserID)
 	default:
 		return nil
 	}
-}
-
-func (u *User) decodeMessage(message []byte) (domain.Event, error) {
-	var decoded domain.Event
-	err := json.Unmarshal(message, &decoded)
-	return decoded, err
 }

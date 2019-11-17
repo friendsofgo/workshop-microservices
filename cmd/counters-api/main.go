@@ -59,7 +59,6 @@ func main() {
 		userEventHandler = event.NewUserHandler(creatingService)
 		userConsumer     = kafka.NewConsumer(dialer, userTopic, userGroup)
 	)
-
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
 
