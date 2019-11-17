@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/friendsofgo/workshop-microservices/internal/creating"
+	"github.com/friendsofgo/workshop-microservices/kit/domain"
 )
 
 const userCreatedEventType = "USER_CREATED"
@@ -18,13 +19,9 @@ func NewUserHandler(creatingService creating.Service) *User {
 	return &User{creatingService: creatingService}
 }
 
-type UserMessage struct {
-	EventID   string `json:"event_id"`
-	EventType string `json:"event_type"`
-	Data      struct {
-		UserID   string `json:"user_id"`
-		UserName string `json:"user_name"`
-	} `json:"data"`
+type CreatedUserEventPayload struct {
+	UserID   string `mapstructure:"user_id"`
+	UserName string `mapstructure:"user_name"`
 }
 
 func (u *User) Handle(ctx context.Context, message []byte) error {
@@ -35,15 +32,21 @@ func (u *User) Handle(ctx context.Context, message []byte) error {
 
 	switch m.EventType {
 	case userCreatedEventType:
-		log.Printf("%s message(%s) consumed", userCreatedEventType, m.EventID)
-		return u.creatingService.CreateCounter(ctx, "My first counter", m.Data.UserID)
+		log.Printf("%s message(%s) consumed", userCreatedEventType, m.ID)
+		var payload CreatedUserEventPayload
+		err := m.DecodePayload(&payload)
+		if err != nil {
+			return err
+		}
+
+		return u.creatingService.CreateCounter(ctx, "My first counter", payload.UserID)
 	default:
 		return nil
 	}
 }
 
-func (u *User) decodeMessage(message []byte) (UserMessage, error) {
-	var decoded UserMessage
+func (u *User) decodeMessage(message []byte) (domain.Event, error) {
+	var decoded domain.Event
 	err := json.Unmarshal(message, &decoded)
 	return decoded, err
 }

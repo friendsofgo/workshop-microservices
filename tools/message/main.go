@@ -7,7 +7,9 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/friendsofgo/workshop-microservices/kit/domain"
 	"github.com/friendsofgo/workshop-microservices/kit/ulid"
 
 	"github.com/friendsofgo/workshop-microservices/kit/kafka"
@@ -45,21 +47,19 @@ func publishcreateUserMessage(ctx context.Context) {
 		UserID   string `json:"user_id"`
 		UserName string `json:"user_name"`
 	}
-	userCreatedMessage := struct {
-		ID        string `json:"event_id"`
-		EventType string `json:"event_type"`
-		Data      data   `json:"data"`
-	}{
-		ID:        ulid.New(),
-		EventType: "USER_CREATED",
-		Data: data{
+	userCreatedEvt := domain.Event{
+		ID:          ulid.New(),
+		EventType:   "USER_CREATED",
+		AggregateID: userID,
+		Payload: data{
 			UserID:   userID,
 			UserName: fmt.Sprintf("fogo_user_%s", userID),
 		},
+		OccurredOn: time.Now(),
 	}
-	if err := publisher.Publish(ctx, userCreatedMessage); err != nil {
+	if err := publisher.Publish(ctx, userCreatedEvt); err != nil {
 		log.Fatalln("error trying to publish USER_CREATED message on kafka: ", err)
 	}
 
-	log.Printf("USER_CREATED event: %s published\n", userCreatedMessage.ID)
+	log.Printf("USER_CREATED event: %s published\n", userCreatedEvt.ID)
 }

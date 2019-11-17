@@ -10,6 +10,7 @@ import (
 
 	"github.com/friendsofgo/workshop-microservices/cmd/counters-api/event"
 	"github.com/friendsofgo/workshop-microservices/cmd/counters-api/server/http"
+	counters "github.com/friendsofgo/workshop-microservices/internal"
 	"github.com/friendsofgo/workshop-microservices/internal/creating"
 	"github.com/friendsofgo/workshop-microservices/internal/fetching"
 	"github.com/friendsofgo/workshop-microservices/internal/storage/mongo"
@@ -30,10 +31,11 @@ func main() {
 		mongoPort, _ = strconv.ParseUint(os.Getenv("WORKSHOP_MONGO_PORT"), 10, 32)
 		mongoDB      = os.Getenv("WORKSHOP_MONGO_DB")
 
-		brokersStr = os.Getenv("WORKSHOP_KAFKA_BROKERS")
-		brokers    = strings.Split(brokersStr, ",")
-		userTopic  = os.Getenv("WORKSHOP_KAFKA_USER_TOPIC")
-		userGroup  = os.Getenv("WORKSHOP_KAFKA_USER_GROUP")
+		brokersStr   = os.Getenv("WORKSHOP_KAFKA_BROKERS")
+		brokers      = strings.Split(brokersStr, ",")
+		userTopic    = os.Getenv("WORKSHOP_KAFKA_USER_TOPIC")
+		userGroup    = os.Getenv("WORKSHOP_KAFKA_USER_GROUP")
+		counterTopic = os.Getenv("WORKSHOP_KAFKA_COUNTER_TOPIC")
 	)
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
@@ -46,11 +48,14 @@ func main() {
 	}
 
 	var (
+		dialer                = kafka.Dial(brokers)
+		kafkaCounterPublisher = kafka.NewPublisher(dialer, counterTopic)
+		counterPublisher      = counters.NewPublisher(kafkaCounterPublisher)
+
 		counterRepository = mongo.NewCounterRepository(mongoClient.Database(mongoDB))
-		creatingService   = creating.NewService(counterRepository)
+		creatingService   = creating.NewService(counterRepository, counterPublisher)
 		fetchingService   = fetching.NewService(counterRepository)
 
-		dialer           = kafka.Dial(brokers)
 		userEventHandler = event.NewUserHandler(creatingService)
 		userConsumer     = kafka.NewConsumer(dialer, userTopic, userGroup)
 	)

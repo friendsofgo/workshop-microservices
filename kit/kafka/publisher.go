@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/friendsofgo/workshop-microservices/kit/ulid"
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/snappy"
+
+	"github.com/friendsofgo/workshop-microservices/kit/ulid"
 )
 
 // Publisher defines the properties of a publisher

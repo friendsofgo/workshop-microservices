@@ -7,6 +7,7 @@ require (
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/joho/godotenv v1.3.0
+	github.com/mitchellh/mapstructure v1.1.2
 	github.com/oklog/ulid/v2 v2.0.2
 	github.com/segmentio/kafka-go v0.3.4
 	github.com/stretchr/testify v1.4.0
