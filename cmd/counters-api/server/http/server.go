@@ -1,56 +1,42 @@
 package http
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/friendsofgo/workshop-microservices/internal/creating"
 )
 
 type Server struct {
 	host string
 	port uint
+	srv  *http.ServeMux
 
-	srv *http.ServeMux
+	creating creating.Service
+	logger   *log.Logger
 }
 
 // NewServer return a new HTTP server
-func NewServer(host string, port uint) *Server {
+func NewServer(ctx context.Context, host string, port uint, c creating.Service, logger *log.Logger) *Server {
 	s := &Server{
-		host: host,
-		port: port,
+		host:   host,
+		port:   port,
+		logger: logger,
+		srv:    http.NewServeMux(),
 
-		srv: http.NewServeMux(),
+		creating: c,
 	}
-
-	s.srv.HandleFunc("/health", s.healthHandler)
+	s.srv.HandleFunc("/health", s.healthHandler(ctx))
+	s.srv.HandleFunc("/counters", s.createCounterHandler(ctx))
 	return s
 }
 
 // Serve execute the server on the host and port indicated previously
-func (s Server) Serve() {
+func (s Server) Serve() error {
 	httpAddr := fmt.Sprintf("%s:%d", s.host, s.port)
 	log.Println("The server is on tap now:", httpAddr)
 
-	_ = http.ListenAndServe(httpAddr, s.srv)
-}
-
-type healthResponse struct {
-	Kind    string `json:"kind"`
-	Message string `json:"message"`
-}
-
-func (s Server) healthHandler(w http.ResponseWriter, r *http.Request) {
-	response := map[string]healthResponse{
-		"data": healthResponse{Kind: "health", Message: "everything is fine"},
-	}
-
-	b, err := json.Marshal(response)
-	if err != nil {
-		http.Error(w, "error proccessing the response", http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write(b)
+	return http.ListenAndServe(httpAddr, s.srv)
 }
