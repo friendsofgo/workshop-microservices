@@ -49,8 +49,8 @@ func main() {
 
 	var (
 		dialer = kafka.Dial(brokers)
-		// maybe you need this...
 		kafkaCounterPublisher = kafka.NewPublisher(dialer, counterTopic)
+		// maybe you need this...
 		_                     = counters.NewPublisher(kafkaCounterPublisher)
 
 		counterRepository = mongo.NewCounterRepository(mongoClient.Database(mongoDB))
