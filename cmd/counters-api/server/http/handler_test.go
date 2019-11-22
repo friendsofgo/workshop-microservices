@@ -8,6 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/friendsofgo/workshop-microservices/internal/creating"
+	"github.com/stretchr/testify/mock"
+
 	creatingmock "github.com/friendsofgo/workshop-microservices/test/creating"
 )
 
@@ -42,4 +45,15 @@ func TestServer_healthHandler(t *testing.T) {
 
 func TestServer_createHandler(t *testing.T) {
 	t.Fatal("To be implemented...")
+	// maybe you'll need to call buildMockCreatingService...
+}
+
+func buildMockCreatingService() creating.Service {
+	service := &creatingmock.Service{}
+	service.On("CreateCounter",
+		mock.Anything,
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
+	).Return(nil).Once()
+	return service
 }
